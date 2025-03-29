@@ -108,7 +108,8 @@ const RemovalRequestForm = () => {
     try {
       const requestId = addRequest(formData);
       
-      if (requestId) {
+      // Navigate to request details page if requestId exists
+      if (requestId && typeof requestId === 'string') {
         navigate(`/request/${requestId}`);
       }
     } catch (error) {
