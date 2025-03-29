@@ -4,6 +4,17 @@ import { useNavigate } from "react-router-dom";
 import { useApp } from "@/contexts/AppContext";
 import { Button } from "@/components/ui/button";
 import {
+  SidebarProvider,
+  Sidebar,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarHeader,
+  SidebarTrigger,
+  SidebarInset
+} from "@/components/ui/sidebar";
+import {
   LogOut,
   Plus,
   FileText,
@@ -36,88 +47,103 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <SidebarProvider>
+      <div className="min-h-screen flex flex-col w-full bg-gray-50">
+        {/* Mobile Header */}
+        <header className="bg-white shadow-sm border-b py-3 px-4 flex justify-between items-center md:hidden">
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-gray-900">Item Removal System</h1>
+            <SidebarTrigger className="mr-3" />
+            <h1 className="text-lg font-bold text-gray-900">Item Removal</h1>
           </div>
-          <div className="flex items-center space-x-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={handleLogout} 
+            className="flex items-center gap-1"
+          >
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </header>
+
+        {/* Sidebar */}
+        <Sidebar>
+          <SidebarHeader className="flex flex-col gap-2 p-4">
+            <h2 className="text-lg font-bold">Item Removal System</h2>
             <div className="text-sm text-gray-700">
-              <span className="font-medium">{user.name}</span>
-              <span className="mx-1">•</span>
-              <span>{user.role}</span>
-              <span className="mx-1">•</span>
-              <span>{user.department}</span>
+              <div className="font-medium">{user.name}</div>
+              <div className="text-xs text-gray-500">{user.role} • {user.department}</div>
             </div>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => navigate("/dashboard")} 
+                  tooltip="Dashboard"
+                >
+                  <Home className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => navigate("/new-request")} 
+                  tooltip="New Request"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>New Request</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => navigate("/my-requests")} 
+                  tooltip="My Requests"
+                >
+                  <FileText className="h-4 w-4" />
+                  <span>My Requests</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => navigate("/approvals")} 
+                  tooltip="Approvals"
+                >
+                  <ClipboardCheck className="h-4 w-4" />
+                  <span>Approvals</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton 
+                  onClick={() => navigate("/profile")} 
+                  tooltip="Profile"
+                >
+                  <UserCircle className="h-4 w-4" />
+                  <span>Profile</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarContent>
+          <div className="mt-auto p-4">
             <Button 
               variant="outline" 
               size="sm" 
               onClick={handleLogout} 
-              className="flex items-center gap-1"
+              className="w-full flex items-center gap-2"
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
             </Button>
           </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="flex-1 flex">
-        {/* Sidebar */}
-        <aside className="w-56 bg-white border-r shadow-sm">
-          <nav className="p-4 space-y-1">
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start" 
-              onClick={() => navigate("/dashboard")}
-            >
-              <Home className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start" 
-              onClick={() => navigate("/new-request")}
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              New Request
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start" 
-              onClick={() => navigate("/my-requests")}
-            >
-              <FileText className="mr-2 h-4 w-4" />
-              My Requests
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start" 
-              onClick={() => navigate("/approvals")}
-            >
-              <ClipboardCheck className="mr-2 h-4 w-4" />
-              Approvals
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="w-full justify-start" 
-              onClick={() => navigate("/profile")}
-            >
-              <UserCircle className="mr-2 h-4 w-4" />
-              Profile
-            </Button>
-          </nav>
-        </aside>
+        </Sidebar>
 
         {/* Content */}
-        <main className="flex-1 p-6">
-          {children}
-        </main>
+        <SidebarInset>
+          <div className="p-4 sm:p-6 h-full">
+            {children}
+          </div>
+        </SidebarInset>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
