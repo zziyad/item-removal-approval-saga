@@ -1,18 +1,20 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/contexts/AppContext";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CheckCircle, Clock, Search } from "lucide-react";
 import { canUserApprove } from "@/lib/mockData";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Approvals = () => {
   const { user, requests } = useApp();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
   
@@ -41,25 +43,28 @@ const Approvals = () => {
   
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <h1 className="text-2xl font-bold">Pending Approvals</h1>
+      <div className={isMobile ? "space-y-5 px-2 pb-6" : "space-y-8 max-w-7xl mx-auto pb-10 px-4"}>
+        <PageHeader 
+          title="Pending Approvals" 
+          description="Review and process requests waiting for your approval"
+        />
         
         {/* Filters */}
-        <div className="flex items-center space-x-4">
+        <div className={isMobile ? "flex flex-col space-y-3" : "flex items-center space-x-4"}>
           <div className="relative flex-1">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
             <Input
               type="search"
               placeholder="Search requests..."
-              className="pl-8"
+              className="pl-8 h-10"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           
-          <div className="w-64">
+          <div className={isMobile ? "w-full" : "w-64"}>
             <Select value={filterStatus} onValueChange={setFilterStatus}>
-              <SelectTrigger>
+              <SelectTrigger className="h-10">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
               <SelectContent>
@@ -84,16 +89,19 @@ const Approvals = () => {
             filteredApprovals.map((request) => (
               <Card key={request.id} className="p-4 hover:shadow-md transition-shadow">
                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-medium text-lg">
+                  <div className="max-w-[65%]">
+                    <h3 className={isMobile ? "font-medium text-base truncate" : "font-medium text-lg truncate"}>
                       {request.itemDescription}
                     </h3>
-                    <div className="flex flex-col sm:flex-row sm:space-x-4 text-sm text-gray-500 mt-1">
+                    <div className={isMobile 
+                      ? "flex flex-col text-xs text-gray-500 mt-1" 
+                      : "flex flex-col sm:flex-row sm:space-x-4 text-sm text-gray-500 mt-1"
+                    }>
                       <p>Requested by {request.userName}</p>
                       <p>Department: {request.department}</p>
-                      <p>Status: {formatStatus(request.status)}</p>
+                      <p>Status: <span className="text-amber-600 font-medium">{formatStatus(request.status)}</span></p>
                     </div>
-                    <div className="text-sm text-gray-500 mt-1">
+                    <div className={isMobile ? "text-xs text-gray-500 mt-1" : "text-sm text-gray-500 mt-1"}>
                       <p>
                         {request.term === "RETURNABLE" ? "Returnable" : "Non-Returnable"} • 
                         Submitted on {request.createdAt.toLocaleDateString()}
@@ -101,8 +109,12 @@ const Approvals = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-amber-500" />
-                    <Button onClick={() => navigate(`/request/${request.id}`)}>
+                    <Clock className="w-5 h-5 text-amber-500" />
+                    <Button 
+                      onClick={() => navigate(`/request/${request.id}`)}
+                      size={isMobile ? "sm" : "default"}
+                      className={isMobile ? "h-9 text-xs" : ""}
+                    >
                       Review
                     </Button>
                   </div>

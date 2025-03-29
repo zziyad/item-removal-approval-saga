@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { RemovalRequest, User, RemovalReason, Image } from "@/types";
 import { v4 as uuidv4 } from "uuid";
@@ -12,12 +11,19 @@ import {
 } from "@/lib/mockData";
 import { toast } from "../hooks/use-toast";
 
+// Define a type for the item data
+interface ItemData {
+  description: string;
+  reasonId: string;
+  customReason?: string;
+}
+
 interface AppContextType {
   user: User | null;
   setUser: (user: User | null) => void;
   requests: RemovalRequest[];
   removalReasons: RemovalReason[];
-  addRequest: (request: Omit<RemovalRequest, "id" | "userId" | "userName" | "department" | "status" | "approvals" | "createdAt" | "updatedAt">) => void;
+  addRequest: (request: Omit<RemovalRequest, "id" | "userId" | "userName" | "department" | "status" | "approvals" | "createdAt" | "updatedAt">) => string | undefined;
   getRequest: (id: string) => RemovalRequest | undefined;
   updateRequestStatus: (id: string, approved: boolean, signature?: string, rejectionReason?: string) => void;
   users: User[];

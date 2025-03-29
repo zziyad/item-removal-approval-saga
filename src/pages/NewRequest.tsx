@@ -1,6 +1,6 @@
-
 import AppLayout from "@/components/AppLayout";
 import RemovalRequestForm from "@/components/RemovalRequestForm";
+import PageHeader from "@/components/PageHeader";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const NewRequest = () => {
@@ -8,11 +8,11 @@ const NewRequest = () => {
   
   return (
     <AppLayout>
-      <div className="space-y-4 sm:space-y-6 max-w-3xl mx-auto">
-        <h1 className="text-xl sm:text-2xl font-bold">New Removal Request</h1>
-        <p className="text-gray-600 text-sm sm:text-base">
-          Fill out the form below to submit a new item removal request.
-        </p>
+      <div className={isMobile ? "space-y-4 px-2 pb-6" : "space-y-6 max-w-4xl mx-auto pb-10"}>
+        <PageHeader
+          title="New Removal Request"
+          description="Fill out the form below to submit a new item removal request."
+        />
         <RemovalRequestForm />
       </div>
     </AppLayout>

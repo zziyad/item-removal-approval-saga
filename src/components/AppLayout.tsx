@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/contexts/AppContext";
@@ -50,9 +49,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex flex-col w-full bg-gray-50">
+      <div className="flex h-screen w-full bg-gray-50 overflow-hidden">
         {/* Mobile Header */}
-        <header className="bg-white shadow-sm border-b py-3 px-4 flex justify-between items-center md:hidden">
+        <header className="fixed top-0 left-0 right-0 z-50 bg-white shadow-sm border-b py-3 px-4 flex justify-between items-center md:hidden">
           <div className="flex items-center">
             <SidebarTrigger className="mr-3" />
             <h1 className="text-lg font-bold text-gray-900">Item Removal</h1>
@@ -68,22 +67,23 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         </header>
 
         {/* Sidebar */}
-        <Sidebar>
-          <SidebarHeader className="flex flex-col gap-2 p-4">
-            <h2 className="text-lg font-bold">Item Removal System</h2>
+        <Sidebar className="border-r shadow-sm bg-white">
+          <SidebarHeader className="flex flex-col gap-2 p-5 border-b">
+            <h2 className="text-xl font-bold">Item Removal System</h2>
             <div className="text-sm text-gray-700">
               <div className="font-medium">{user.name}</div>
-              <div className="text-xs text-gray-500">{user.role} • {user.department}</div>
+              <div className="text-xs uppercase tracking-wide text-gray-500">{user.role} • {user.department}</div>
             </div>
           </SidebarHeader>
           <SidebarContent>
-            <SidebarMenu>
+            <SidebarMenu className="py-2">
               <SidebarMenuItem>
                 <SidebarMenuButton 
                   onClick={() => navigate("/dashboard")} 
                   tooltip="Dashboard"
+                  className="py-3 px-4 hover:bg-gray-100 text-base"
                 >
-                  <Home className="h-4 w-4" />
+                  <Home className="h-5 w-5 mr-3" />
                   <span>Dashboard</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -91,8 +91,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <SidebarMenuButton 
                   onClick={() => navigate("/new-request")} 
                   tooltip="New Request"
+                  className="py-3 px-4 hover:bg-gray-100 text-base"
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="h-5 w-5 mr-3" />
                   <span>New Request</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -100,8 +101,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <SidebarMenuButton 
                   onClick={() => navigate("/my-requests")} 
                   tooltip="My Requests"
+                  className="py-3 px-4 hover:bg-gray-100 text-base"
                 >
-                  <FileText className="h-4 w-4" />
+                  <FileText className="h-5 w-5 mr-3" />
                   <span>My Requests</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -109,8 +111,9 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <SidebarMenuButton 
                   onClick={() => navigate("/approvals")} 
                   tooltip="Approvals"
+                  className="py-3 px-4 hover:bg-gray-100 text-base"
                 >
-                  <ClipboardCheck className="h-4 w-4" />
+                  <ClipboardCheck className="h-5 w-5 mr-3" />
                   <span>Approvals</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -118,19 +121,19 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
                 <SidebarMenuButton 
                   onClick={() => navigate("/profile")} 
                   tooltip="Profile"
+                  className="py-3 px-4 hover:bg-gray-100 text-base"
                 >
-                  <UserCircle className="h-4 w-4" />
+                  <UserCircle className="h-5 w-5 mr-3" />
                   <span>Profile</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
-          <div className="mt-auto p-4">
+          <div className="mt-auto p-5 border-t">
             <Button 
               variant="outline" 
-              size="sm" 
               onClick={handleLogout} 
-              className="w-full flex items-center gap-2"
+              className="w-full flex items-center justify-center h-10 gap-2"
             >
               <LogOut className="h-4 w-4" />
               <span>Logout</span>
@@ -140,7 +143,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
 
         {/* Content */}
         <SidebarInset>
-          <div className="p-4 sm:p-6 h-full">
+          <div className={isMobile ? "h-full overflow-y-auto pt-14" : "h-full overflow-y-auto"}>
             {children}
           </div>
         </SidebarInset>

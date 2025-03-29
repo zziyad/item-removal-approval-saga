@@ -1,17 +1,19 @@
-
 import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useApp } from "@/contexts/AppContext";
 import AppLayout from "@/components/AppLayout";
+import PageHeader from "@/components/PageHeader";
 import RequestDetails from "@/components/RequestDetails";
 import ApprovalActions from "@/components/ApprovalActions";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Printer } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const RequestDetail = () => {
   const { id } = useParams<{ id: string }>();
   const { getRequest, removalReasons } = useApp();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const request = id ? getRequest(id) : undefined;
   
@@ -33,21 +35,20 @@ const RequestDetail = () => {
   
   return (
     <AppLayout>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => navigate(-1)}
-              className="flex items-center gap-1"
-            >
-              <ArrowLeft className="h-4 w-4" />
-              <span>Back</span>
-            </Button>
-            <h1 className="text-2xl font-bold">Request Details</h1>
-          </div>
-          
+      <div className={isMobile ? "space-y-5 px-2 pb-6" : "space-y-8 max-w-7xl mx-auto pb-10 px-4"}>
+        <div className="flex items-center mb-4">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-1 mr-4"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>Back</span>
+          </Button>
+        </div>
+        
+        <PageHeader title="Request Details" description={`Request ID: ${id}`}>
           <Button 
             variant="outline" 
             size="sm" 
@@ -57,7 +58,7 @@ const RequestDetail = () => {
             <Printer className="h-4 w-4" />
             <span>Print</span>
           </Button>
-        </div>
+        </PageHeader>
         
         <RequestDetails request={request} removalReasons={removalReasons} />
         
