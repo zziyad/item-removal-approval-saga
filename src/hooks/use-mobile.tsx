@@ -1,6 +1,7 @@
 
 import * as React from "react"
 
+// Defining a breakpoint for mobile devices
 const MOBILE_BREAKPOINT = 768
 
 export function useIsMobile() {
@@ -13,6 +14,7 @@ export function useIsMobile() {
   })
 
   React.useEffect(() => {
+    // Creating a media query list
     const mql = window.matchMedia(`(max-width: ${MOBILE_BREAKPOINT - 1}px)`)
     
     const handleResize = () => {
@@ -30,6 +32,7 @@ export function useIsMobile() {
     // Set initial value
     handleResize()
     
+    // Clean up event listeners
     return () => {
       if (mql.removeEventListener) {
         mql.removeEventListener("change", handleResize)

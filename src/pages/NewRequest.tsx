@@ -1,8 +1,11 @@
 
 import AppLayout from "@/components/AppLayout";
 import RemovalRequestForm from "@/components/RemovalRequestForm";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const NewRequest = () => {
+  const isMobile = useIsMobile();
+  
   return (
     <AppLayout>
       <div className="space-y-4 sm:space-y-6 max-w-3xl mx-auto">

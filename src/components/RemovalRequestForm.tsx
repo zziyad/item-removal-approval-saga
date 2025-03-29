@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/contexts/AppContext";
@@ -102,9 +103,11 @@ const RemovalRequestForm = () => {
     setIsSubmitting(true);
     
     try {
-      const requestId = addRequest(formData);
+      // Store the result and explicitly check if it's a string
+      const result = addRequest(formData);
+      const requestId = typeof result === 'string' ? result : null;
       
-      if (requestId && typeof requestId === 'string') {
+      if (requestId) {
         navigate(`/request/${requestId}`);
       }
     } catch (error) {
