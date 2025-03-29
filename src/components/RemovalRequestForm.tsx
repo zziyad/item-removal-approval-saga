@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp } from "@/contexts/AppContext";
@@ -14,6 +13,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FormData {
   term: RemovalTerm;
@@ -30,6 +30,7 @@ interface FormData {
 const RemovalRequestForm = () => {
   const { addRequest, removalReasons } = useApp();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   
   const [formData, setFormData] = useState<FormData>({
     term: "RETURNABLE",
@@ -42,14 +43,12 @@ const RemovalRequestForm = () => {
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Handle form field changes
   const handleChange = (
     field: keyof FormData,
     value: string | Date | undefined | { id: string; url: string }[]
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     
-    // Clear related fields when changing term
     if (field === "term") {
       if (value === "RETURNABLE") {
         setFormData((prev) => ({ 
@@ -68,7 +67,6 @@ const RemovalRequestForm = () => {
     }
   };
   
-  // Handle image upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
@@ -92,7 +90,6 @@ const RemovalRequestForm = () => {
     }
   };
   
-  // Remove image
   const removeImage = (id: string) => {
     setFormData((prev) => ({
       ...prev,
@@ -100,7 +97,6 @@ const RemovalRequestForm = () => {
     }));
   };
   
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -108,7 +104,6 @@ const RemovalRequestForm = () => {
     try {
       const requestId = addRequest(formData);
       
-      // Navigate to request details page if requestId exists
       if (requestId && typeof requestId === 'string') {
         navigate(`/request/${requestId}`);
       }
@@ -119,16 +114,14 @@ const RemovalRequestForm = () => {
     }
   };
   
-  // Handle next/previous step navigation
   const nextStep = () => setStep((prev) => prev + 1);
   const prevStep = () => setStep((prev) => prev - 1);
   
   return (
     <div className="max-w-2xl mx-auto">
       <Card>
-        <CardContent className="p-6">
+        <CardContent className={isMobile ? "p-3" : "p-6"}>
           <form onSubmit={handleSubmit}>
-            {/* Step 1: Basic details */}
             {step === 1 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">Item Details</h2>
@@ -242,7 +235,6 @@ const RemovalRequestForm = () => {
               </div>
             )}
             
-            {/* Step 2: Item description and reason */}
             {step === 2 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">Item Description</h2>
@@ -304,7 +296,6 @@ const RemovalRequestForm = () => {
               </div>
             )}
             
-            {/* Step 3: Image upload and review */}
             {step === 3 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-semibold mb-4">Images & Review</h2>
@@ -347,7 +338,6 @@ const RemovalRequestForm = () => {
                   </div>
                 )}
                 
-                {/* Summary */}
                 <div className="bg-gray-50 p-4 rounded-lg mt-4">
                   <h3 className="font-medium mb-2">Form Summary</h3>
                   <ul className="space-y-1 text-sm">
