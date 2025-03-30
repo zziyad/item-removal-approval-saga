@@ -1,30 +1,50 @@
-
-import { useState } from "react";
+import { useId } from "react";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { useApp } from "@/contexts/AppContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
-const LoginForm = () => {
+// Define validation schema with Zod
+const loginSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(1, "Password is required"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+export default function LoginForm() {
   const { users, setUser } = useApp();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [userId, setUserId] = useState("");
-  const [loading, setLoading] = useState(false);
+  const formId = useId();
+  
+  // Initialize form with react-hook-form
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const isSubmitting = form.formState.isSubmitting;
 
-    // Simulate API call
-    setTimeout(() => {
-      const selectedUser = users.find((user) => user.id === userId);
+  const onSubmit = async (values: LoginFormValues) => {
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      if (selectedUser) {
+      const selectedUser = users.find(
+        (user) => user.email.toLowerCase() === values.email.toLowerCase()
+      );
+      
+      if (selectedUser && values.password === "password") {
         setUser(selectedUser);
         toast({
           title: "Login successful",
@@ -34,13 +54,17 @@ const LoginForm = () => {
       } else {
         toast({
           title: "Login failed",
-          description: "Please select a valid user",
+          description: "Invalid email or password",
           variant: "destructive",
         });
       }
-      
-      setLoading(false);
-    }, 1000);
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -48,41 +72,64 @@ const LoginForm = () => {
       <CardHeader>
         <CardTitle>Log In</CardTitle>
         <CardDescription>
-          Select a user to log in to the Item Removal System
+          Enter your credentials to log in to the Item Removal System
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleLogin}>
-        <CardContent>
-          <div className="grid w-full items-center gap-4">
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="user">User</Label>
-              <Select value={userId} onValueChange={setUserId} required>
-                <SelectTrigger id="user">
-                  <SelectValue placeholder="Select a user" />
-                </SelectTrigger>
-                <SelectContent position="popper">
-                  {users.map((user) => (
-                    <SelectItem key={user.id} value={user.id}>
-                      {user.name} ({user.role} - {user.department})
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      <Form {...form}>
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+          <CardContent>
+            <div className="grid w-full items-center gap-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor={`${formId}-email`}>Email</FormLabel>
+                    <FormControl>
+                      <Input 
+                        id={`${formId}-email`}
+                        type="email" 
+                        autoComplete="email"
+                        disabled={isSubmitting}
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel htmlFor={`${formId}-password`}>Password</FormLabel>
+                    <FormControl>
+                      <Input 
+                        id={`${formId}-password`}
+                        type="password" 
+                        autoComplete="current-password"
+                        disabled={isSubmitting}
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-            <div className="flex flex-col space-y-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value="password" readOnly />
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter>
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Logging in..." : "Login"}
-          </Button>
-        </CardFooter>
-      </form>
+          </CardContent>
+          <CardFooter>
+            <Button 
+              type="submit" 
+              className="w-full" 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Logging in..." : "Login"}
+            </Button>
+          </CardFooter>
+        </form>
+      </Form>
     </Card>
   );
-};
-
-export default LoginForm;
+}

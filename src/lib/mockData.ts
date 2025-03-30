@@ -1,15 +1,15 @@
 
 import { RemovalReason, RemovalRequest, User, RemovalStatus, UserRole } from "@/types";
 
-export const mockUsers: User[] = [
-  { id: "1", name: "John Doe", department: "IT", role: "EMPLOYEE" },
-  { id: "2", name: "Jane Smith", department: "IT", role: "HOD" },
-  { id: "3", name: "Mike Johnson", department: "FINANCE", role: "FINANCE" },
-  { id: "4", name: "Sarah Williams", department: "MANAGEMENT", role: "MOD" },
-  { id: "5", name: "David Brown", department: "SECURITY", role: "SECURITY" },
-  { id: "6", name: "Emily Davis", department: "HR", role: "EMPLOYEE" },
-  { id: "7", name: "Admin User", department: "MANAGEMENT", role: "ADMIN" },
-];
+  export const mockUsers: User[] = [
+    { id: "1", name: "John Doe", department: "IT", role: "EMPLOYEE", email: "john@z.com" },
+    { id: "2", name: "Jane Smith", department: "IT", role: "HOD", email: "jane@z.com" },
+    { id: "3", name: "Mike Johnson", department: "FINANCE", role: "FINANCE", email: "mike@z.com" },
+    { id: "4", name: "Sarah Williams", department: "MANAGEMENT", role: "MOD", email: "sarah@z.com" },
+    { id: "5", name: "David Brown", department: "SECURITY", role: "SECURITY", email: "david@z.com" },
+    { id: "6", name: "Emily Davis", department: "HR", role: "EMPLOYEE", email: "emily@z.com" },
+    { id: "7", name: "Admin User", department: "MANAGEMENT", role: "ADMIN", email: "admin@z.com" },
+  ];
 
 export const mockRemovalReasons: RemovalReason[] = [
   { id: "1", name: "Personal Use" },

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, ReactNode } from "react";
 import { RemovalRequest, User, RemovalReason, Image } from "@/types";
 import { v4 as uuidv4 } from "uuid";
 import { 
@@ -9,7 +9,7 @@ import {
   getNextStatus,
   getCurrentApprovalStage
 } from "@/lib/mockData";
-import { toast } from "../hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 // Define a type for the item data
 interface ItemData {
@@ -31,9 +31,13 @@ interface AppContextType {
   removeImage: (requestId: string, imageId: string) => void;
 }
 
+interface AppProviderProps {
+  children: ReactNode;
+}
+
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
-export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function AppProvider({ children }: AppProviderProps) {
   const [user, setUser] = useState<User | null>(null);
   const [requests, setRequests] = useState<RemovalRequest[]>([]);
   const [removalReasons] = useState<RemovalReason[]>(mockRemovalReasons);
@@ -42,8 +46,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   // Load state from localStorage on initial render
   useEffect(() => {
     const { requests: storedRequests, currentUser } = loadFromLocalStorage();
-    setRequests(storedRequests);
-    setUser(currentUser);
+    if (storedRequests?.length) {
+      setRequests(storedRequests);
+    }
+    if (currentUser) {
+      setUser(currentUser);
+    }
   }, []);
 
   // Save state to localStorage whenever it changes
@@ -51,7 +59,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     saveToLocalStorage(requests, user);
   }, [requests, user]);
 
-  const addRequest = (newRequestData: Omit<RemovalRequest, "id" | "userId" | "userName" | "department" | "status" | "approvals" | "createdAt" | "updatedAt">) => {
+  const addRequest = useCallback((newRequestData: Omit<RemovalRequest, "id" | "userId" | "userName" | "department" | "status" | "approvals" | "createdAt" | "updatedAt">) => {
     if (!user) {
       toast({
         title: "Error",
@@ -83,13 +91,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     return newRequest.id;
-  };
+  }, [user]);
 
-  const getRequest = (id: string) => {
+  const getRequest = useCallback((id: string) => {
     return requests.find((request) => request.id === id);
-  };
+  }, [requests]);
 
-  const updateRequestStatus = (id: string, approved: boolean, signature?: string, rejectionReason?: string) => {
+  const updateRequestStatus = useCallback((id: string, approved: boolean, signature?: string, rejectionReason?: string) => {
     if (!user) {
       toast({
         title: "Error",
@@ -140,9 +148,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return request;
       });
     });
-  };
+  }, [user]);
 
-  const addImage = (requestId: string, imageUrl: string) => {
+  const addImage = useCallback((requestId: string, imageUrl: string) => {
     setRequests((prevRequests) => {
       return prevRequests.map((request) => {
         if (request.id === requestId) {
@@ -153,16 +161,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
           
           return {
             ...request,
-            images: [...request.images, newImage],
+            images: [...(request.images || []), newImage],
             updatedAt: new Date(),
           };
         }
         return request;
       });
     });
-  };
+  }, []);
 
-  const removeImage = (requestId: string, imageId: string) => {
+  const removeImage = useCallback((requestId: string, imageId: string) => {
     setRequests((prevRequests) => {
       return prevRequests.map((request) => {
         if (request.id === requestId) {
@@ -175,32 +183,43 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return request;
       });
     });
-  };
+  }, []);
+
+  // Memoize the context value to prevent unnecessary rerenders
+  const contextValue = useMemo(() => ({
+    user,
+    setUser,
+    requests,
+    removalReasons,
+    addRequest,
+    getRequest,
+    updateRequestStatus,
+    users,
+    addImage,
+    removeImage,
+  }), [
+    user,
+    requests,
+    removalReasons,
+    addRequest,
+    getRequest,
+    updateRequestStatus,
+    users,
+    addImage,
+    removeImage
+  ]);
 
   return (
-    <AppContext.Provider
-      value={{
-        user,
-        setUser,
-        requests,
-        removalReasons,
-        addRequest,
-        getRequest,
-        updateRequestStatus,
-        users,
-        addImage,
-        removeImage,
-      }}
-    >
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );
-};
+}
 
-export const useApp = () => {
+export function useApp() {
   const context = useContext(AppContext);
   if (context === undefined) {
     throw new Error("useApp must be used within an AppProvider");
   }
   return context;
-};
+}

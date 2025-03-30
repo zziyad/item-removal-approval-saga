@@ -20,6 +20,7 @@ export interface User {
   name: string;
   department: string;
   role: UserRole;
+  email: string;
 }
 
 export interface Approval {
